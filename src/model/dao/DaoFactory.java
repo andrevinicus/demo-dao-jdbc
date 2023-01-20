@@ -4,10 +4,15 @@
  */
 package model.dao;
 
+import db.DB;
+import model.dao.impl.SellerDaoJDBC;
+
 /**
  *
  * @author GCM_02
  */
 public class DaoFactory {
-    
+    public static SellerDao creatSallerDao(){
+        return new SellerDaoJDBC(DB.getConnection());
+    }
 }
