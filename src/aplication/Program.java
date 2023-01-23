@@ -33,10 +33,16 @@ public class Program {
             System.out.println(obj);
        
         }
-        System.out.println("\n=== TESTE 3: seller Inset ====");
+        System.out.println("\n=== TESTE 4: seller Inset ====");
         Seller newSeller = new Seller(1, "Greg", "greg@gmail.com", new Date(), 4000.0, departament); 
         sellerDao.insert(newSeller);
         System.out.println("Inserted! New Id = " + newSeller.getId());
+        
+        System.out.println("\n=== TESTE 5: seller Inset ====");
+        seller = sellerDao.findById(1);
+        seller.setName("Marta Waine");
+        sellerDao.update(seller);
+        System.out.println("Update completado");
     }
-
+        
 }
