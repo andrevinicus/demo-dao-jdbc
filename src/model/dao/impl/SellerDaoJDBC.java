@@ -11,7 +11,10 @@ import db.DB;
 import db.DbException;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.dao.SellerDao;
 import model.entities.Departament;
 import model.entities.Seller;
@@ -49,7 +52,7 @@ public class SellerDaoJDBC implements SellerDao {
         ResultSet rs = null;
 
         try {
-            st = conn.preparableStatement("SELECT seller.*,department.Name as DepName "
+            st = (PreparableStatement) conn.prepareStatement("SELECT seller.*,department.Name as DepName "
                     + "FROM seller INNER JOIN department "
                     + "ON seller.DepartmentId = department.Id "
                     + "WHERE seller.Id = ? ");
@@ -89,7 +92,7 @@ public class SellerDaoJDBC implements SellerDao {
 
     private Seller intantiateSeller(ResultSet rs, Departament dep) throws SQLException {
         Seller obj = new Seller();
-        
+
         obj.setId(rs.getInt("Id"));
         obj.setName(rs.getString("Name"));
         obj.setEmail(rs.getString("Email"));
@@ -97,6 +100,45 @@ public class SellerDaoJDBC implements SellerDao {
         obj.setBirthDate(rs.getDate("BirthDate"));
         obj.setDepartament(dep);
         return obj;
+    }
+
+    @Override
+    public List<Seller> findByDepartament(Departament departament) {
+        PreparableStatement st = null;
+        ResultSet rs = null;
+
+        try {
+            st = (PreparableStatement) conn.prepareStatement(
+                    "SELECT seller.*,department.Name as DepName "
+                    + "FROM seller INNER JOIN department "
+                    + "ON seller.DepartmentId = department.Id"
+                    + "WHERE DepartmentId = ?"
+                    + "ORDER BY Name");
+
+            st.setInt(1, departament.getId());
+            rs = st.executeQuery();
+
+            List<Seller> list = new ArrayList<>();
+            Map<Integer, Departament> map = new HashMap<>();
+
+            while (rs.next()) {
+
+                Departament dep = map.get(rs.getInt("DepartmentId"));
+                if (dep == null) {
+                    dep = intantiateDepartament(rs);
+                    map.put(rs.getInt("DepartmentId"), dep);
+                }
+
+                Seller obj = intantiateSeller(rs, dep);
+                list.add(obj);
+            }
+            return list;
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement((Statement) st);
+            DB.closeConnection(rs);
+        }
     }
 
 }

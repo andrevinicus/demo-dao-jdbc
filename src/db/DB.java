@@ -51,4 +51,8 @@ public class DB {
             }
         }
     }
+
+    public static void closeConnection(ResultSet rs) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
